@@ -182,7 +182,7 @@ function module:OnEvent(event, ...)
 		end
 	-- fires before a new round begins
 	elseif( event == "PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE" ) then
-		if not _G[FRAME_PLAYER].player.scanned then return end -- guard: scan_pets may not have run yet
+		if not (_G[FRAME_PLAYER].player and _G[FRAME_PLAYER].player.scanned) then return end -- guard: scan_pets may not have run yet
 		PT:RoundUpPets();
 		self.BattleFrame_UpdateSpeedButtons(_G[FRAME_PLAYER]);
 		self.BattleFrame_UpdateSpeedButtons(_G[FRAME_ENEMY]);
@@ -192,6 +192,8 @@ function module:OnEvent(event, ...)
 		local side = ...;
 		local frame = get_frame(side);
 		local enemy = get_enemy(frame);
+
+		if not (frame.player and frame.player.scanned) then return end -- guard: scan_pets may not have run yet
 
 		--self.glowing_hideall(frame);
 
@@ -213,7 +215,7 @@ function module:OnEvent(event, ...)
 	elseif( event == "PET_BATTLE_HEALTH_CHANGED" or event == "PET_BATTLE_MAX_HEALTH_CHANGED" ) then
 		local side, pet = ...;
 		local frame = get_frame(side);
-		if not frame.player.scanned then return end -- guard: scan_pets may not have run yet
+		if not (frame.player and frame.player.scanned) then return end -- guard: scan_pets may not have run yet
 
 		if( pet == frame.player.activePet ) then
 			PT:RoundUpPets(side);
