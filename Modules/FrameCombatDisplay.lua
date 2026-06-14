@@ -182,6 +182,7 @@ function module:OnEvent(event, ...)
 		end
 	-- fires before a new round begins
 	elseif( event == "PET_BATTLE_PET_ROUND_PLAYBACK_COMPLETE" ) then
+		if not _G[FRAME_PLAYER].player.scanned then return end -- guard: scan_pets may not have run yet
 		PT:RoundUpPets();
 		self.BattleFrame_UpdateSpeedButtons(_G[FRAME_PLAYER]);
 		self.BattleFrame_UpdateSpeedButtons(_G[FRAME_ENEMY]);
@@ -212,6 +213,7 @@ function module:OnEvent(event, ...)
 	elseif( event == "PET_BATTLE_HEALTH_CHANGED" or event == "PET_BATTLE_MAX_HEALTH_CHANGED" ) then
 		local side, pet = ...;
 		local frame = get_frame(side);
+		if not frame.player.scanned then return end -- guard: scan_pets may not have run yet
 
 		if( pet == frame.player.activePet ) then
 			PT:RoundUpPets(side);
@@ -775,6 +777,7 @@ function module.BattleFrame_UpdateSpeedButtons(self)
 		-- iterate through enemy pets and (re-)calculate speed bonuses
 		for enemPet = PT.PET_INDEX, self.enemy.numPets do
 			-- update speed buttons
+			if not self.player[pet] or not self.enemy[enemPet] then break end -- guard: subtables may not be initialised yet
 			speed, flying = PT:GetSpeedBonus( self.player[pet], self.enemy[enemPet] );
 
 			if( speed == PT.BONUS_SPEED_FASTER ) then -- faster
@@ -799,6 +802,7 @@ function module.BattleFrame_UpdateHealthState(self)
 	local enemy_name = enemy:GetName();
 
 	for pet = PT.PET_INDEX, self.player.numPets do
+		if not self.player[pet] then break end -- guard: subtable may not be initialised yet
 		if( self.player[pet].dead ) then
 			_G[frame_name.."Pet"..pet].Button.Dead:Show();
 			_G[frame_name.."Pet"..pet].Button.Border:Hide();

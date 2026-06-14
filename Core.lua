@@ -435,7 +435,7 @@ do
 			--t[pet].pet = pet;
 			t[pet].name = "Dummy "..pet;
 			t[pet].level = random(1, 25);
-			t[pet].species = species;
+			t[pet].species = nil; -- species is not available in scan_dummys scope (upvalue from scan_pets only)
 			t[pet].type = random(1, 10);
 			t[pet].power = t[pet].level * random(2, 20);
 			t[pet].speed = t[pet].level * random(7, 15);
@@ -521,6 +521,7 @@ do
 	-- all states are stored in the .auratable and have to be treated as table indexes (simple lookup)
 	-- called by the event handler
 	function PT:ScanPetAuras(player)
+		if not player or not player.aurastates then return end -- guard: scan_pets may not have run yet
 		_G.wipe(player.aurastates); -- wipe old aurastate data
 
 		local slot;
